@@ -1,117 +1,94 @@
-## Task List
+Problem Statement
+Objective
 
-Given below is a list of tasks and subtasks, some of which are compulsory and some optional. We recommend you complete all of them since the end objective is to create a structured data table that can be used for predictive or descriptive analysis. 
+The assignment is meant for you to apply the learnings of the module on Hive to a real-life dataset. One of the major objectives of this assignment is to gain familiarity with performing analytics with Hive.
+
+ 
+Problem Statement
+
+New York City is a thriving metropolis, and like most other cities of its size, one of the biggest problems faced by its residents is the lack of parking space. The classic combination of a huge number of cars and cramped geography is the exact recipe that leads to a large number of parking tickets.
 
  
 
-## General instructions: 
-
-Command prompt file will not be sharable as a submission, so you can make your submission as a document, a presentation, or a pdf file. 
-
-In your submission, include
-
-The query you have written to answer each task. 
-
-Screenshot of the result you got. 
-
-You can use a template like the one linked here to create your submission file. The file attached is an example and you are free to use any other format. 
-
- 
-## Tasks 
+In an attempt to scientifically analyze this phenomenon, the NYC Police Department regularly collects data related to parking tickets. This data is made available by the NYC Open Data portal. Your job is to try and perform some analysis on this data in order to answer the questions that follow.
 
  
 
-## Read the data. (10%)
+Note: The data for 2017 has been uploaded on an S3 bucket at the following link:
 
-- Read in the data using the mongoimport command.
-
-Hint: The data is in the form of an array of JSON objects. So the mongoimport command you have used in the module will not work directly. You will have to let mongoimport know that the file you are importing is not just a JSON file but an array of JSON files. The syntax mongoimport for the JSON array is
- 
-mongoimport <usual mongo import command> -- jsonArray
- 
-
-- Display data for the match with “game” = “3”
-
-Suggestion: Use the pretty function to make the data readable.
- 
-
-- Explore the data for game 3. (40%)
-
-In this subtask, you are expected to create a new collection with only the document relating to game 3. You can create the new document with the help of the code below. 
-
-db.<new_collection_name>.save( <query that you used to display data for match 3>.toArray()  )
- 
-
-- Display the Game Feed data for the game in the new collection.
- 
-
-Display the last event in game 3.
-Hint: Event is a nested field. You can use the dot operator to access the nested fields. For example, to access the Action field inside the Game Feed, you can write the query as
-
-{"$Game_Feed.Action": <condition>}
- 
-
-- Who won game 3, imposters or crew?
-How will you know who won the game? check the 'Game Feed' for all the events in game 3. 
-Write a query to display only the Game Feed field for game 3. Note the lack of underscore between Game and Feed. This field is a nested field inside the Game_Feed field. Refer to serial number 8 in the Game_Feed data dictionary.
- 
-
-- Who picked the black color in game 3? Was that player crew or imposter?
- 
-
-- How many voting events happened in game 3?
- 
-
-- This task was focused on exploring a single document. As explained earlier the document is made of 4 main fields and three of those are nested and hold a lot of data.
-If you were to redesign this database to make it easier to query what changes would you make to the structure? Explain your design decisions. Do not modify the structure, simply explain the changes you want to make and justify them.
- 
-
-Overall aggregation. (40%)
-For this set of questions, use the earlier data collection with all 499 games.
- 
-
-- How many events in total do you have data for, in this collection (across all games)? 
-An event as explained earlier is a record of development in the game. For instance, game 3 had 10 events. 
-
-- How many matches did the crew win versus how many matches did the impostors win?
-Hint: Use regular expressions to analyze the game feed column for all entries documents where the Outcome field is not empty. 
-
--Find out how many matches were played on each map. Your output should contain the names of maps and the number of games played on each map. 
-Hint: You will have to ensure only one event from each game is filtered before grouping. 
-
-- How many times in total across all games did the crew skip a vote? 
-
-- How many times in total across all matches does the crew vote against imposters?
- 
-
-The questions you answered in this task were all related to high-level aggregations across the entire collection. In your opinion, is the game more or less hard for impostors? Justify your answer with suitable insights from the data.
- 
-
-- Player-level aggregation. (10%)
-In this set of tasks, we will aggregate the data player-wise. Let’s say that we want to create a dashboard to select players for games. You have to convert the data to a structured format where each row represents one player and some of their statistics.
-
-- Find the number of unique players in the data set.
-Hint: Check the data type of the output of the query you write to get the set of unique players, and then decide how you will calculate the number of unique players.  
-
-- Who is the best crew member?
-Find the player who (as a crewmate) voted to remove the imposters the most number of times. 
-
-- Who is the worst crew member?
-Find the player who (as a crewmate) voted to remove the other crew members the most number of times. 
-
-- Find the win percentage for all players. (Optional)
-Win percentage can be calculated by the total number of games the player has won divided by the total matches the player has participated in. 
-
-- Find the color preference of all players. (Optional)
-The color preference of a player is the color they picked the most number of times.
-
-- Create an export from MongoDB in the form given below (Optional)
-As discussed earlier the aim of this exercise was to create a table for predictive and descriptive analysis. The table given below is one way to create a structured output from the given data. 
- 
-Player name 	Games won as imposter	Games won as crew	Win percentage (overall)	Voted Against Imposter	Voted against Crew members 	Color preference 	Voting rate
- 	 	 	 	 	 	 	 
-
+s3://hiveassignmentdatabde/Parking_Violations_Issued_-_Fiscal_Year_2017.csv
 
  
 
-In tasks 4 and 5 you create some player-wise statistics. Explain statistics that you might want to explore (other than the ones that were calculated earlier) during the exercise of selecting players. 
+STEPS BELOW FOR SETTING UP:
+
+    You have been given this data set in the S3 bucket. For the command mentioned below, you need to download this data into the EMR cluster from the given public S3 bucket. You need to follow the given steps you have followed in the last sessions:
+
+    wget  https://hive-assignment-bucket.s3.amazonaws.com/Parking_Violations_Issued_-_Fiscal_Year_2017.csv;
+
+     
+    In case S3 bucket is down, please find the alternative steps mentioned at the bottom of this page.
+
+    Launch Hive and create a database. 
+
+    Create tables inside the database as per the CSV file; delimited by ‘|’ and lines separated by ‘\n’.
+
+    Next, you have to move the tables you downloaded from S3 by using the command
+
+        load data <local path of S3 file> into table <table name> ;
+
+         
+
+ 
+
+Consider only the data for the year 2017 itself for your analysis, not the current year.
+
+ 
+
+The data dictionary is available on this page.
+
+
+The analysis can be divided into two parts:
+
+ 
+Part-I: Examine the data
+
+    Find the total number of tickets for the year.
+    Find out the total number of states to which the cars with tickets belong. The count of states is mandatory here; providing the exact list of states is optional.
+    Some parking tickets don’t have addresses on them, which is a cause for concern. Find out the number of such tickets which have no addresses. (i.e. tickets where one of the Street Codes, i.e. "Street Code 1" or "Street Code 2" or "Street Code 3" is empty)
+
+ 
+Part-II: Aggregation tasks
+
+    Find out the frequency of parking violations across different times of the day: The Violation Time field is specified in a strange format. Find a way to make this into a time attribute that you can use to divide into groups.
+    Divide 24 hours into six equal discrete bins of time. The intervals you choose are at your discretion. For each of these groups, find the 3 most commonly occurring violations.
+    Now, try another direction. For the 3 most commonly occurring violation codes, find the most common times of day (in terms of the bins from the previous part).
+    Let’s try and find some seasonality in this data:
+        First, divide the year into seasons, and find the frequencies of tickets for each season. (Hint: A quick Google search reveals the following seasons in NYC: Spring(March, April, May); Summer(June, July, August); Fall(September, October, November); Winter(December, January, February))
+        Then, find the 3 most common violations for each of these seasons.
+
+ 
+
+To analyze the date-time variables, you could use inbuilt Hive functions. Please find reference documentation along with examples on the below-mentioned links:
+
+1. Apache Hive documentation
+
+2. Hive tutorial for date-time format
+
+ 
+
+Note: Please ensure you make necessary optimizations to your queries, like selecting the appropriate table format and using partitioned/bucketed tables. 
+
+ 
+
+Dataset mirror links: 
+
+In case the HTTP S3 link seems to be down. The data can be copied to personal S3 by using the following command:
+
+#Working with EMR Cluster
+aws s3 cp s3://hiveassignmentdatabde/Parking_Violations_Issued_-_Fiscal_Year_2017.csv s3://<bucket-name>
+
+Or you can download the CSV file from this link.
+
+ 
+All The Best!!!
